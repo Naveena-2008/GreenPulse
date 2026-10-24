@@ -1,0 +1,531 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#123d2b">
+  <meta name="description" content="GreenPulse — track your trees, plantation locations, and green journey.">
+  <title>GreenPulse | Tree Tracker</title>
+
+  <link rel="preconnect" href="https://unpkg.com">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <div class="app">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <a href="#overview" class="brand" data-page="overview">
+        🌿 <span>GreenPulse</span>
+      </a>
+
+      <p class="side-heading">WORKSPACE</p>
+
+      <nav aria-label="Main navigation">
+        <button type="button" class="nav-btn active" data-page="overview">
+          ▦ Overview
+        </button>
+        <button type="button" class="nav-btn" data-page="trees">
+          🌳 My Trees
+        </button>
+        <button type="button" class="nav-btn" data-page="map-page">
+          📍 Real Map
+        </button>
+        <button type="button" class="nav-btn" data-page="analytics">
+          📊 Analytics
+        </button>
+        <button type="button" class="nav-btn" data-page="profile">
+          👤 My Profile
+        </button>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <div class="plant-icon">🌱</div>
+        <h3>Small actions,<br>greener futures.</h3>
+        <p>Every tree makes a difference.</p>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main">
+
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">YOUR PERSONAL ECO DASHBOARD</p>
+          <h1 id="page-title">Overview</h1>
+        </div>
+
+        <button type="button" class="primary-btn" data-open-modal>
+          ＋ Add a tree
+        </button>
+      </header>
+
+      <!-- OVERVIEW -->
+      <section class="page active" id="overview">
+        <div class="hero">
+          <div>
+            <p class="eyebrow">MAKE EVERY TREE COUNT</p>
+            <h2>A greener tomorrow<br>starts with you.</h2>
+            <p>
+              Record your trees, locate your plantations,
+              and nurture your green footprint.
+            </p>
+            <button type="button" class="primary-btn" data-open-modal>
+              ＋ Record a plantation
+            </button>
+          </div>
+
+          <div class="hero-art" aria-hidden="true">🌳🌿</div>
+        </div>
+
+        <div class="stats-grid">
+          <article class="stat-card">
+            <span>🌳 Total trees</span>
+            <strong id="total-trees">0</strong>
+          </article>
+
+          <article class="stat-card">
+            <span>💚 Healthy</span>
+            <strong id="healthy-trees">0</strong>
+          </article>
+
+          <article class="stat-card">
+            <span>💧 Need water</span>
+            <strong id="water-trees">0</strong>
+          </article>
+
+          <article class="stat-card">
+            <span>🩺 Needs care</span>
+            <strong id="care-trees">0</strong>
+          </article>
+        </div>
+
+        <div class="two-columns">
+          <article class="panel">
+            <div class="panel-heading">
+              <h3>Recently added trees</h3>
+              <button type="button" class="text-btn" data-page="trees">
+                View all →
+              </button>
+            </div>
+            <div id="recent-trees" class="item-list"></div>
+          </article>
+
+          <article class="panel">
+            <h3>Care reminders</h3>
+            <div id="care-reminders" class="item-list"></div>
+          </article>
+        </div>
+      </section>
+
+      <!-- MY TREES -->
+      <section class="page" id="trees">
+        <article class="panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">YOUR TREE DATABASE</p>
+              <h2>Every tree has a story.</h2>
+              <p class="muted">
+                Search, review, and manage your plantation records.
+              </p>
+            </div>
+
+            <button type="button" class="primary-btn" data-open-modal>
+              ＋ Add a tree
+            </button>
+          </div>
+
+          <div class="toolbar">
+            <input
+              id="tree-search"
+              type="search"
+              placeholder="Search trees or locations"
+              aria-label="Search trees or locations">
+
+            <select id="status-filter" aria-label="Filter by health">
+              <option value="">All statuses</option>
+              <option>Healthy</option>
+              <option>Need Water</option>
+              <option>Needs Care</option>
+            </select>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>TREE</th>
+                  <th>LOCATION</th>
+                  <th>DATE</th>
+                  <th>HEALTH</th>
+                  <th>COORDINATES</th>
+                  <th>ACTION</th>
+                </tr>
+              </thead>
+              <tbody id="trees-table-body"></tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+
+      <!-- REAL MAP -->
+      <section class="page" id="map-page">
+        <article class="panel">
+          <p class="eyebrow">REAL-WORLD TREE LOCATIONS</p>
+          <h2>Explore your green footprint.</h2>
+          <p class="muted">
+            Search a place, use your laptop's location,
+            or click directly on the map.
+          </p>
+
+          <div class="toolbar map-toolbar">
+            <input
+              id="map-search"
+              type="search"
+              placeholder="Search Chennai, Chidambaram, district..."
+              aria-label="Search a map location">
+
+            <button type="button" class="primary-btn" id="map-search-btn">
+              Search place
+            </button>
+
+            <button type="button" class="secondary-btn" id="map-gps-btn">
+              ◎ Use my GPS
+            </button>
+          </div>
+
+          <p id="map-message" class="message" role="status"></p>
+
+          <div id="map" aria-label="Interactive tree location map"></div>
+
+          <p class="map-note">
+            Map data © OpenStreetMap contributors. Internet access is required.
+          </p>
+        </article>
+
+        <article class="panel">
+          <h3>Saved tree locations</h3>
+          <div id="location-list" class="location-grid"></div>
+        </article>
+      </section>
+
+      <!-- ANALYTICS -->
+      <section class="page" id="analytics">
+        <article class="panel">
+          <p class="eyebrow">YOUR ENVIRONMENTAL IMPACT</p>
+          <h2>Tree analytics</h2>
+          <p class="muted">
+            A summary of your saved plantation records.
+          </p>
+          <div id="analytics-summary" class="stats-grid"></div>
+        </article>
+
+        <div class="two-columns">
+          <article class="panel">
+            <h3>Health distribution</h3>
+            <div id="health-breakdown" class="bar-list"></div>
+          </article>
+
+          <article class="panel">
+            <h3>Trees by location</h3>
+            <div id="location-breakdown" class="bar-list"></div>
+          </article>
+        </div>
+      </section>
+
+      <!-- INNOVATIVE MODEL 2 PROFILE -->
+      <section class="page" id="profile">
+
+        <!-- Premium profile banner -->
+        <div class="profile-cover">
+          <div class="cover-decoration cover-circle-one"></div>
+          <div class="cover-decoration cover-circle-two"></div>
+
+          <div class="profile-cover-content">
+            <span class="profile-label">GREENPULSE MEMBER</span>
+            <h2>Your green journey starts here.</h2>
+            <p>
+              Every little action helps create a greener future.
+            </p>
+          </div>
+
+          <div class="profile-avatar" aria-label="Decorative plant avatar">
+            🌱
+          </div>
+        </div>
+
+        <!-- Profile introduction -->
+        <div class="profile-welcome">
+          <div>
+            <p class="eyebrow">YOUR PERSONAL SPACE</p>
+            <h2>Grow your impact.</h2>
+            <p class="muted">
+              Manage your details and celebrate your progress.
+            </p>
+          </div>
+
+          <div class="member-pill">
+            <span class="online-dot"></span>
+            Green guardian
+          </div>
+        </div>
+
+        <!-- Profile feature cards -->
+        <div class="profile-feature-grid">
+
+          <article class="profile-feature">
+            <div class="feature-icon">🌳</div>
+            <h3>Your tree collection</h3>
+            <p>
+              Keep your plantation records organised
+              and watch your collection grow.
+            </p>
+            <button type="button" class="text-btn" data-page="trees">
+              Explore my trees →
+            </button>
+          </article>
+
+          <article class="profile-feature">
+            <div class="feature-icon">📍</div>
+            <h3>Your green locations</h3>
+            <p>
+              Explore the places where your trees are growing.
+            </p>
+            <button type="button" class="text-btn" data-page="map-page">
+              Explore the map →
+            </button>
+          </article>
+
+          <article class="profile-feature">
+            <div class="feature-icon">📈</div>
+            <h3>Your progress</h3>
+            <p>
+              Review your saved tree records and their health distribution.
+            </p>
+            <button type="button" class="text-btn" data-page="analytics">
+              View analytics →
+            </button>
+          </article>
+
+        </div>
+
+        <!-- Profile editor and milestones -->
+        <div class="profile-content-grid">
+
+          <!-- Keep the original profile form IDs for JavaScript -->
+          <article class="panel profile-edit-panel">
+
+            <div class="profile-section-heading">
+              <div>
+                <p class="eyebrow">ACCOUNT SETTINGS</p>
+                <h2>Personal details</h2>
+                <p class="muted">
+                  Update your information whenever you need to.
+                </p>
+              </div>
+              <div class="edit-icon" aria-hidden="true">✎</div>
+            </div>
+
+            <form id="profile-form">
+              <label for="profile-name">Your name</label>
+              <input
+                id="profile-name"
+                name="profile-name"
+                autocomplete="name"
+                placeholder="Enter your name">
+
+              <label for="profile-email">Email address</label>
+              <input
+                id="profile-email"
+                name="profile-email"
+                type="email"
+                autocomplete="email"
+                placeholder="Enter your email">
+
+              <label for="profile-location">Your city or district</label>
+              <input
+                id="profile-location"
+                name="profile-location"
+                autocomplete="address-level2"
+                placeholder="e.g. Chennai">
+
+              <button class="primary-btn profile-save-btn" type="submit">
+                ✓ Save my profile
+              </button>
+            </form>
+
+            <p class="profile-privacy">
+              🔒 Your profile details are saved in this browser.
+            </p>
+          </article>
+
+          <!-- Decorative milestones -->
+          <div class="profile-side-column">
+
+            <article class="panel profile-milestones">
+              <p class="eyebrow">YOUR NEXT CHAPTER</p>
+              <h3>Green milestones</h3>
+              <p class="muted">
+                Build your own sustainability journey,
+                one tree at a time.
+              </p>
+
+              <div class="milestone-item">
+                <span class="milestone-icon">🌱</span>
+                <div>
+                  <strong>First seed</strong>
+                  <p>Add your first tree record.</p>
+                </div>
+                <span class="milestone-arrow">→</span>
+              </div>
+
+              <div class="milestone-item">
+                <span class="milestone-icon">💧</span>
+                <div>
+                  <strong>Plant protector</strong>
+                  <p>Keep track of tree health and care.</p>
+                </div>
+                <span class="milestone-arrow">→</span>
+              </div>
+
+              <div class="milestone-item">
+                <span class="milestone-icon">🗺️</span>
+                <div>
+                  <strong>Green explorer</strong>
+                  <p>Record locations for your trees.</p>
+                </div>
+                <span class="milestone-arrow">→</span>
+              </div>
+            </article>
+
+            <article class="green-message-card">
+              <span class="message-leaf" aria-hidden="true">🍃</span>
+              <p class="eyebrow">A LITTLE REMINDER</p>
+              <h3>Small actions.<br>Lasting change.</h3>
+              <p>
+                Your green journey is made of the things
+                you do consistently.
+              </p>
+            </article>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- FOOTER -->
+      <footer>
+        Made with 🌱 for a greener planet · GreenPulse
+      </footer>
+
+    </main>
+  </div>
+
+  <!-- ADD TREE MODAL -->
+  <div id="tree-modal" class="modal" aria-hidden="true">
+    <div class="modal-card">
+
+      <div class="panel-heading">
+        <div>
+          <p class="eyebrow">GROW SOMETHING GOOD</p>
+          <h2>Add a tree</h2>
+        </div>
+
+        <button
+          type="button"
+          id="close-modal"
+          class="close-btn"
+          aria-label="Close">
+          ✕
+        </button>
+      </div>
+
+      <form id="tree-form">
+
+        <label for="tree-name">Tree name *</label>
+        <input
+          id="tree-name"
+          name="tree-name"
+          required
+          placeholder="e.g. Papaya">
+
+        <label for="tree-location">Location / place name *</label>
+        <input
+          id="tree-location"
+          name="tree-location"
+          required
+          placeholder="Search a city or use GPS">
+
+        <div class="button-row">
+          <button
+            type="button"
+            class="secondary-btn"
+            id="tree-find-place">
+            Find place
+          </button>
+
+          <button
+            type="button"
+            class="secondary-btn"
+            id="tree-use-gps">
+            ◎ Use my GPS
+          </button>
+        </div>
+
+        <p
+          id="form-location-message"
+          class="message"
+          role="status">
+        </p>
+
+        <label for="tree-date">Planting date</label>
+        <input id="tree-date" name="tree-date" type="date">
+
+        <label for="tree-status">Tree health</label>
+        <select id="tree-status" name="tree-status">
+          <option>Healthy</option>
+          <option>Need Water</option>
+          <option>Needs Care</option>
+        </select>
+
+        <label for="tree-notes">Notes (optional)</label>
+        <textarea
+          id="tree-notes"
+          name="tree-notes"
+          rows="3"
+          placeholder="Add tree details..."></textarea>
+
+        <input id="tree-lat" name="tree-lat" type="hidden">
+        <input id="tree-lon" name="tree-lon" type="hidden">
+
+        <div class="button-row">
+          <button class="primary-btn" type="submit">
+            Save tree
+          </button>
+
+          <button
+            class="secondary-btn"
+            id="cancel-modal"
+            type="button">
+            Cancel
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <!-- Leaflet map library -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- Your existing app functionality -->
+  <script src="script.js"></script>
+</body>
+</html>
